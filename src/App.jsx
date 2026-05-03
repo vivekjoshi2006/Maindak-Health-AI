@@ -31,7 +31,7 @@ function App() {
 
 
     try {
-      const res = await axios.post("/api/chatbot/ask", {
+      const res = await axios.post("http://127.0.0.1:5000/api/chatbot/ask", {
         message: queryInput,
         type: type
       });
@@ -161,9 +161,9 @@ function App() {
 
                     {/* Social */}
 
-                    <div className="contact-dock">
-                      <a href="mailto:vivekjoshi41996@gmail.com" className="social-icon-btn">📧</a>
-                      <a href="https://www.linkedin.com/in/vivekjoshi2006" target="_blank" rel="noreferrer" className="social-icon-btn">🔗</a>
+                    <div className="contact-dock"> 
+                      <a href="mailto:vivekjoshi41996@gmail.com" className="social-icon-btn" title="Email">📧</a>
+                      <a href="https://www.linkedin.com/in/vivekjoshi2006" target="_blank" rel="noreferrer" className="social-icon-btn" title="LinkedIn">🔗</a>
                       <span className="guard-snake-mega">🐍</span>
                     </div>
                   </div>
