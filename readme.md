@@ -49,7 +49,7 @@ Meet **Froggy**, your personal guide. Froggy brings the application to life thro
 
 ### **1. Clone the Repository**
 ```bash
-git clone https://github.com/vivekjoshi2006/Maindak_Health_AI.git
+git clone https://github.com/vivekjoshi2006/Maindak-The-Health-AI.git
 cd Maindak_Health_AI
 ```
 
