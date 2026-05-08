@@ -9,7 +9,7 @@ function App() {
   
   // ---------------------------------------------- STATE MANAGEMENT ----------------------------------------------
 
-  const [input, setInput] = useState('');                     // input query
+  const [input, setInput] = useState('');                     // Input query
   const [result, setResult] = useState(null);                 // Result data
   const [loading, setLoading] = useState(false);              // Loading state for API calls
   const [darkMode, setDarkMode] = useState(false);            // Theme
