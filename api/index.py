@@ -7,109 +7,113 @@ import re
 app = Flask(__name__)
 CORS(app)
 
-# --- 💊 INTERNAL MEDICAL KNOWLEDGE BASE ---
-# This ensures that even if scraping is blocked, the user gets data.
-KNOWLEDGE_BASE = {
-    "FEVER": {
-        "details": [
-            "Monitor your body temperature regularly using a digital thermometer.",
-            "Stay well-hydrated by drinking plenty of water, electrolytes, or warm soups.",
-            "Get adequate rest to allow your immune system to fight the underlying infection.",
-            "Use a cool compress on the forehead to help reduce discomfort naturally."
-        ],
-        "medicines": ["Paracetamol (Dolo 650, Crocin)", "Ibuprofen (Brufen)", "Nimesulide (Sumo)"],
-        "links": [{"title": "Fever Care - Mayo Clinic", "url": "https://www.mayoclinic.org/diseases-conditions/fever/diagnosis-treatment/drc-20352764"}]
-    },
-    "COLD": {
-        "details": [
-            "Keep the nasal passages moist using saline sprays or a humidifier.",
-            "Gargle with warm salt water to relieve a sore throat.",
-            "Avoid cold drinks and prefer warm herbal teas or ginger water.",
-            "Steam inhalation can help clear a congested nose."
-        ],
-        "medicines": ["Cetirizine (Okacet)", "Levocetirizine (1-AL)", "Phenylephrine (Solvin Cold)"],
-        "links": [{"title": "Common Cold Guide - Healthline", "url": "https://www.healthline.com/health/common-cold"}]
-    }
+# --- DEFAULT MEDICINES DATABASE ---
+DEFAULT_MEDS = {
+    "FEVER": ["Paracetamol (Dolo 650, Crocin)", "Ibuprofen (Brufen)", "Nimesulide (Sumo)"],
+    "COLD": ["Cetirizine (Okacet)", "Levocetirizine (1-AL)", "Phenylephrine (Solvin Cold)"],
+    "COUGH": ["Dextromethorphan (Dry Cough)", "Ambroxol (Wet Cough)", "Honitus (Ayurvedic)"],
+    "HEADACHE": ["Paracetamol", "Aspirin (Disprin)", "Diclofenac Gel (Volini)"],
+    "STOMACH PAIN": ["Meftal-Spas", "Cyclopam", "Digene (For Acidity)"],
+    "ACIDITY": ["Pantoprazole (Pan-40)", "Eno", "Digene Syrup"],
+    "DIARRHEA": ["ORS (Electral)", "Loperamide (Imodium)", "Sporlac DS"],
+    "BODY PAIN": ["Aceclofenac (Zerodol-P)", "Naproxen", "Ibuprofen"],
+    "VOMITING": ["Ondansetron (Ondem)", "Domperidone (Domstal)"],
+    "ALLERGY": ["Avil", "Allegra (Fexofenadine)", "Cetirizine"]
 }
 
+# --- DEFAULT CARE TIPS (Fallback) ---
 DEFAULT_TIPS = [
-    "Ensure you are getting enough rest and sleep to recover.",
-    "Drink at least 8-10 glasses of water to stay hydrated.",
-    "If symptoms persist for more than 3 days, consult a professional doctor."
+    "Take plenty of rest to help your body recover faster.",
+    "Stay hydrated by drinking water, juice, or soup frequently.",
+    "Monitor your symptoms closely and consult a doctor if they worsen."
 ]
 
 def clean_snippet(text):
     if not text: return ""
+    # Remove currency/pricing mentions
     text = re.sub(r'(₹|Rs\.?)\s?\d+([\d,.]*)', '', text)
     text = text.replace('...', '').strip()
-    sentences = [s.strip() for s in re.split(r'(?<=[.!?]) +', text) if len(s) > 10]
+    
+    # Ensure complete sentences
+    sentences = re.split(r'(?<=[.!?]) +', text)
     if len(sentences) > 1 and not re.search(r'[.!?]$', sentences[-1]):
         sentences.pop()
+    
     final = " ".join(sentences).strip()
-    if final and not final.endswith(('.', '!', '?')): final += "."
+    if final and not final.endswith(('.', '!', '?')): 
+        final += "."
     return final
 
 def fetch_data(query, stype):
-    query_upper = query.upper().strip()
+    disease_key = query.upper().strip()
     
-    # Initialize Data
-    data = {
-        "name": query_upper,
-        "details": [],
-        "medicines": ["Consult a doctor for specific salt names."],
-        "links": [{"title": "Healthline Medical Advice", "url": "https://www.healthline.com"}]
+    # 1. Fetch Medicines from Local DB
+    medicines_list = DEFAULT_MEDS.get(disease_key, ["Consult a doctor for specific salts."])
+
+    # 2. Fetch Precautions from Web
+    search_query = f"{query} symptoms treatment and home care precautions"
+    url = f"https://html.duckduckgo.com/html/?q={search_query}"
+    
+    headers = {
+        "User-Agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/110.0.0.0 Safari/537.36"
     }
 
-    # 1. First, check Internal Knowledge Base (Fastest & Safest)
-    for key, info in KNOWLEDGE_BASE.items():
-        if key in query_upper:
-            data["details"] = info["details"]
-            data["medicines"] = info["medicines"]
-            data["links"] = info["links"]
-            break
+    data = {
+        "name": disease_key,
+        "details": [], 
+        "links": [],   
+        "medicines": medicines_list
+    }
 
-    # 2. Try Web Scraping (Only if Internet allows)
     try:
-        search_url = f"https://html.duckduckgo.com/html/?q={query}+treatment+care+precautions"
-        headers = {"User-Agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36"}
-        response = requests.get(search_url, headers=headers, timeout=5)
-        
-        if response.status_code == 200:
-            soup = BeautifulSoup(response.text, "html.parser")
-            results = soup.find_all('div', class_='result__body')
-            
-            scraped_details = []
-            scraped_links = []
-            
-            for res in results:
-                snippet = res.find('a', class_='result__snippet')
-                title = res.find('a', class_='result__a')
-                
-                if snippet and title:
-                    clean_p = clean_snippet(snippet.text)
-                    if len(clean_p) > 40 and clean_p not in scraped_details:
-                        scraped_details.append(clean_p)
-                    
-                    if len(scraped_links) < 3:
-                        scraped_links.append({"title": title.text.strip(), "url": title['href']})
+        response = requests.get(url, headers=headers, timeout=10)
+        soup = BeautifulSoup(response.text, "html.parser")
+        results = soup.find_all('div', class_='result')
 
-            # Update data if scraping gave us more/better info
-            if len(scraped_details) >= 2: data["details"] = scraped_details[:4]
-            if scraped_links: data["links"] = scraped_links[:3]
+        if results:
+            for res in results:
+                snippet_tag = res.find('a', class_='result__snippet')
+                title_tag = res.find('a', class_='result__a')
+                
+                if snippet_tag and title_tag:
+                    snippet = snippet_tag.text.strip()
+                    title = title_tag.text.strip()
+                    link = title_tag['href']
+                    
+                    point = clean_snippet(snippet)
+                    
+                    # Filter for quality points
+                    if len(data["details"]) < 3 and len(point) > 50:
+                        if point not in data["details"]: 
+                            data["details"].append(point)
+
+                    if len(data["links"]) < 3:
+                        data["links"].append({"title": title, "url": link})
+
+                    if len(data["details"]) == 3 and len(data["links"]) == 3:
+                        break
+        
+        # 3. FALLBACK: Use default tips if web results are empty
+        if not data["details"]:
+            data["details"] = DEFAULT_TIPS
+        if not data["links"]:
+            data["links"] = [{"title": "Healthline - Medical Advice", "url": "https://www.healthline.com"}]
+            
+        return data
 
     except Exception as e:
-        print(f"Scraping failed, using internal backup: {e}")
-
-    # 3. Final Fallback if both failed
-    if not data["details"]: data["details"] = DEFAULT_TIPS
-    
-    return data
+        print(f"Error occurred: {e}")
+        data["details"] = DEFAULT_TIPS
+        return data
 
 @app.route('/api/chatbot/ask', methods=['POST'])
 def ask():
     req = request.json
-    res = fetch_data(req.get('message', ''), req.get('type', 'disease'))
-    return jsonify(res)
+    res = fetch_data(req.get('message'), req.get('type'))
+    if res: 
+        return jsonify(res)
+    return jsonify({"error": "Resource not found"}), 404
 
 if __name__ == '__main__':
-    app.run(debug=True)
+    print("Backend is Running!")
+    app.run(debug=True, port=5000)
