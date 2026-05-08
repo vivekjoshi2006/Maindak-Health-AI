@@ -109,6 +109,7 @@ function App() {
           
 
           {/* Top Navbar Actions */}
+          
           <div className="top-actions-home">
 
 
@@ -295,18 +296,18 @@ function App() {
 
 
               {/* Resources Section */}
-
+              
               <div className="info-box resources-box">
                 <h2 className="box-heading">📚 Verified Resources</h2>
                 <div className="box-content">
-                  <div className="resource-row">
+                  <div className="resource-list-vertical">
                     {result.links?.map((l, i) => (
-                      <React.Fragment key={i}>
+                      <div key={i} className="resource-item-vertical">
+                        <span className="bullet-icon">📍</span>
                         <a href={l.url} target="_blank" rel="noreferrer" className="res-link">
                           {l.title} ↗
                         </a>
-                        {i < result.links.length - 1 && <span className="separator"> / </span>}
-                      </React.Fragment>
+                      </div>
                     ))}
                   </div>
                 </div>
