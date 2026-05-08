@@ -554,6 +554,26 @@ body::-webkit-scrollbar-thumb {
 
 /* Resource Links inside Results */
 
+.resource-list-vertical {
+  display: flex;
+  flex-direction: column; 
+  gap: 15px;              
+  align-items: center;    
+  margin-top: 15px;
+}
+
+.resource-item-vertical {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  width: fit-content;
+}
+
+.bullet-icon {
+  color: var(--primary);
+  font-size: 18px;
+}
+
 .res-link {
   color: #3498db;
   text-decoration: none;
@@ -565,6 +585,10 @@ body::-webkit-scrollbar-thumb {
 .res-link:hover {
   color: var(--primary);
   text-decoration: underline;
+}
+
+.dark .res-link {
+  color: #5dade2;
 }
 
 
