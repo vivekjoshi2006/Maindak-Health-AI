@@ -7,7 +7,7 @@ import re
 app = Flask(__name__)
 CORS(app)
 
-# --- 💊 DEFAULT MEDICINES DATABASE ---
+# --- 💊 ENHANCED MEDICINES DATABASE ---
 DEFAULT_MEDS = {
     "FEVER": ["Paracetamol (Dolo 650, Crocin)", "Ibuprofen (Brufen)", "Nimesulide (Sumo)"],
     "COLD": ["Cetirizine (Okacet)", "Levocetirizine (1-AL)", "Phenylephrine (Solvin Cold)"],
@@ -21,7 +21,7 @@ DEFAULT_MEDS = {
     "ALLERGY": ["Avil", "Allegra (Fexofenadine)", "Cetirizine"]
 }
 
-# --- 🛡️ DEFAULT CARE TIPS (If Internet fails) ---
+# --- 🛡️ FALLBACK CARE TIPS ---
 DEFAULT_TIPS = [
     "Take plenty of rest to help your body recover faster.",
     "Stay hydrated by drinking water, juice, or soup frequently.",
@@ -29,32 +29,42 @@ DEFAULT_TIPS = [
 ]
 
 def clean_snippet(text):
+    """Cleans snippets to ensure they are complete sentences and ad-free."""
     if not text: return ""
-    # Remove commercial keywords
+    # Remove prices and commercial keywords
     text = re.sub(r'(₹|Rs\.?)\s?\d+([\d,.]*)', '', text)
+    blacklist = ['buy', 'discount', 'cashback', 'shop', 'order online', 'genuine']
+    for word in blacklist:
+        text = re.sub(f'(?i){word}', '', text)
+    
     text = text.replace('...', '').strip()
-    # Sentence completion logic
+    
+    # Sentence completion logic: Cut at the last full stop
     sentences = re.split(r'(?<=[.!?]) +', text)
-    if len(sentences) > 1 and not re.search(r'[.!?]$', sentences[-1]):
-        sentences.pop()
-    final = " ".join(sentences).strip()
-    if final and not final.endswith(('.', '!', '?')): final += "."
-    return final
+    if len(sentences) > 1:
+        if not re.search(r'[.!?]$', sentences[-1]):
+            sentences.pop() # Remove the last incomplete sentence
+    
+    final_text = " ".join(sentences).strip()
+    if final_text and not final_text.endswith(('.', '!', '?')):
+        final_text += "."
+    return final_text
 
 def fetch_data(query, stype):
     disease_key = query.upper().strip()
     
-    # 1. दवाइयां (Local Database से)
-    medicines_list = DEFAULT_MEDS.get(disease_key, ["Consult a doctor for specific salts."])
+    # 1. Match Medicine using Fuzzy Matching (e.g., 'Fevers' matches 'FEVER')
+    medicines_list = ["Consult a doctor for specific salts."]
+    for key in DEFAULT_MEDS:
+        if key in disease_key or disease_key in key:
+            medicines_list = DEFAULT_MEDS[key]
+            break
 
-    # 2. प्रिकॉशन्स (Internet से)
-    # सर्च क्वेरी को थोड़ा और बेहतर बनाया
-    search_query = f"{query} symptoms treatment and home care precautions"
+    # 2. Scrape DuckDuckGo with better headers
+    search_query = f"{query} treatment care precautions"
     url = f"https://html.duckduckgo.com/html/?q={search_query}"
-    
-    # Browser जैसा दिखने के लिए Headers
     headers = {
-        "User-Agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/110.0.0.0 Safari/537.36"
+        "User-Agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/119.0.0.0 Safari/537.36"
     }
 
     data = {
@@ -66,10 +76,11 @@ def fetch_data(query, stype):
 
     try:
         response = requests.get(url, headers=headers, timeout=10)
-        soup = BeautifulSoup(response.text, "html.parser")
-        results = soup.find_all('div', class_='result')
+        if response.status_code == 200:
+            soup = BeautifulSoup(response.text, "html.parser")
+            # DuckDuckGo HTML results are usually in result__body or result__snippet
+            results = soup.find_all('div', class_='result__body')
 
-        if results:
             for res in results:
                 snippet_tag = res.find('a', class_='result__snippet')
                 title_tag = res.find('a', class_='result__a')
@@ -80,18 +91,20 @@ def fetch_data(query, stype):
                     link = title_tag['href']
                     
                     point = clean_snippet(snippet)
-                    # Point को तभी जोड़ें जब वो काम का हो और विज्ञापन न हो
+                    
+                    # Store only high-quality care points
                     if len(data["details"]) < 3 and len(point) > 50:
                         if point not in data["details"]: 
                             data["details"].append(point)
 
+                    # Store top 3 resources
                     if len(data["links"]) < 3:
                         data["links"].append({"title": title, "url": link})
 
                     if len(data["details"]) == 3 and len(data["links"]) == 3:
                         break
         
-        # 3. 🚨 FALLBACK: अगर इंटरनेट से कुछ नहीं मिला, तो Default Tips डालो
+        # 3. 🚨 FINAL VALIDATION (If Scraping Failed)
         if not data["details"]:
             data["details"] = DEFAULT_TIPS
         if not data["links"]:
@@ -100,17 +113,24 @@ def fetch_data(query, stype):
         return data
 
     except Exception as e:
-        print(f"Error occurred: {e}")
-        # Error होने पर भी खाली न भेजें
+        print(f"Backend Error: {e}")
         data["details"] = DEFAULT_TIPS
         return data
 
 @app.route('/api/chatbot/ask', methods=['POST'])
 def ask():
-    req = request.json
-    res = fetch_data(req.get('message'), req.get('type'))
-    if res: return jsonify(res)
-    return jsonify({"error": "Froggy is jumping around! 🐸"}), 404
+    try:
+        req = request.json
+        user_message = req.get('message', '')
+        user_type = req.get('type', 'disease')
+        
+        if not user_message:
+            return jsonify({"error": "Empty message"}), 400
+            
+        res = fetch_data(user_message, user_type)
+        return jsonify(res)
+    except Exception as e:
+        return jsonify({"error": str(e)}), 500
 
 if __name__ == '__main__':
     print("Maindak Backend is Running! 🐸")
