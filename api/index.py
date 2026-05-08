@@ -7,7 +7,9 @@ import re
 app = Flask(__name__)
 CORS(app)
 
+
 # --- DEFAULT MEDICINES DATABASE ---
+
 DEFAULT_MEDS = {
     "FEVER": ["Paracetamol (Dolo 650, Crocin)", "Ibuprofen (Brufen)", "Nimesulide (Sumo)"],
     "COLD": ["Cetirizine (Okacet)", "Levocetirizine (1-AL)", "Phenylephrine (Solvin Cold)"],
@@ -21,7 +23,9 @@ DEFAULT_MEDS = {
     "ALLERGY": ["Avil", "Allegra (Fexofenadine)", "Cetirizine"]
 }
 
+
 # --- DEFAULT CARE TIPS (Fallback) ---
+
 DEFAULT_TIPS = [
     "Take plenty of rest to help your body recover faster.",
     "Stay hydrated by drinking water, juice, or soup frequently.",
@@ -30,11 +34,14 @@ DEFAULT_TIPS = [
 
 def clean_snippet(text):
     if not text: return ""
+    
     # Remove currency/pricing mentions
+
     text = re.sub(r'(₹|Rs\.?)\s?\d+([\d,.]*)', '', text)
     text = text.replace('...', '').strip()
     
     # Ensure complete sentences
+
     sentences = re.split(r'(?<=[.!?]) +', text)
     if len(sentences) > 1 and not re.search(r'[.!?]$', sentences[-1]):
         sentences.pop()
@@ -48,9 +55,12 @@ def fetch_data(query, stype):
     disease_key = query.upper().strip()
     
     # 1. Fetch Medicines from Local DB
+
     medicines_list = DEFAULT_MEDS.get(disease_key, ["Consult a doctor for specific salts."])
 
+
     # 2. Fetch Precautions from Web
+
     search_query = f"{query} symptoms treatment and home care precautions"
     url = f"https://html.duckduckgo.com/html/?q={search_query}"
     
@@ -83,6 +93,7 @@ def fetch_data(query, stype):
                     point = clean_snippet(snippet)
                     
                     # Filter for quality points
+
                     if len(data["details"]) < 3 and len(point) > 50:
                         if point not in data["details"]: 
                             data["details"].append(point)
@@ -93,7 +104,9 @@ def fetch_data(query, stype):
                     if len(data["details"]) == 3 and len(data["links"]) == 3:
                         break
         
+
         # 3. FALLBACK: Use default tips if web results are empty
+
         if not data["details"]:
             data["details"] = DEFAULT_TIPS
         if not data["links"]:
