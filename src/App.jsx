@@ -31,7 +31,7 @@ function App() {
 
 
     try {
-      const res = await axios.post("http://127.0.0.1:5000/api/chatbot/ask", {
+      const res = await axios.post("/api/chatbot/ask", {
         message: queryInput,
         type: type
       });
