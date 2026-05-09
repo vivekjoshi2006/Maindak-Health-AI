@@ -6,7 +6,7 @@ import './App.css';
 
 function App() {
 
-  
+
   // ---------------------------------------------- STATE MANAGEMENT ----------------------------------------------
 
   const [input, setInput] = useState('');                     // Input query
@@ -50,8 +50,8 @@ function App() {
   const downloadPDF = () => {
     const element = document.getElementById('report-card-capture');
     const followupSection = document.querySelector('.froggy-followup-box');
-    
-    
+
+
     // UI Cleanup for PDF
 
     if (followupSection) followupSection.style.display = 'none';
@@ -72,7 +72,7 @@ function App() {
 
 
   //------------------------------------------- TRANSLATE WIDGET -------------------------------------------
-  
+
   const handleTranslate = () => {
     const translateElement = document.getElementById('google_translate_element');
     if (translateElement) {
@@ -89,27 +89,27 @@ function App() {
 
 
   // --------------------------------------------- RENDER UI -------------------------------------------------------
-  
+
   return (
     <div className={`maindak-container ${darkMode ? 'dark' : 'light'}`}>
 
 
-     {/* 🌌 COSMIC FLUID MESH GRADIENT */}
+      {/* 🌌 COSMIC FLUID MESH GRADIENT */}
 
-    <div className="mesh-gradient">
-      <div className="mesh-ball ball-1"></div>
-      <div className="mesh-ball ball-2"></div>
-      <div className="mesh-ball ball-3"></div>
-      <div className="mesh-ball ball-4"></div>
-    </div>
-    
+      <div className="mesh-gradient">
+        <div className="mesh-ball ball-1"></div>
+        <div className="mesh-ball ball-2"></div>
+        <div className="mesh-ball ball-3"></div>
+        <div className="mesh-ball ball-4"></div>
+      </div>
+
 
       {!result ? (
         <div className="home-screen">
-          
+
 
           {/* Top Navbar Actions */}
-          
+
           <div className="top-actions-home">
 
 
@@ -135,21 +135,21 @@ function App() {
                   <div className="about-content">
                     <span className="frog-head-large">🐸</span>
                     <h2 className="about-title-main">Maindak AI</h2>
-                    
+
 
                     {/* Info Section */}
 
                     <div className="about-interactive-info">
                       <div className="info-line">
-                        <span className="info-emoji">🌟</span> 
+                        <span className="info-emoji">🌟</span>
                         <p>Get instant, AI-powered health guidance for all your queries.</p>
                       </div>
                       <div className="info-line">
-                        <span className="info-emoji">🛡️</span> 
+                        <span className="info-emoji">🛡️</span>
                         <p>Access verified medical precautions and essential care tips.</p>
                       </div>
                       <div className="info-line">
-                        <span className="info-emoji">⚡</span> 
+                        <span className="info-emoji">⚡</span>
                         <p>Experience fast, smart, and interactive medical assistance.</p>
                       </div>
                     </div>
@@ -158,11 +158,11 @@ function App() {
                     <hr className="about-divider-glow" />
                     <span className="credit-label-text">CREATED BY</span>
                     <h1 className="creator-name-mega">VIVEK JOSHI</h1>
-                    
+
 
                     {/* Social */}
 
-                    <div className="contact-dock"> 
+                    <div className="contact-dock">
                       <a href="mailto:vivekjoshi41996@gmail.com" className="social-icon-btn" title="Email">📧</a>
                       <a href="https://www.linkedin.com/in/vivekjoshi2006" target="_blank" rel="noreferrer" className="social-icon-btn" title="LinkedIn">🔗</a>
                       <span className="guard-snake-mega">🐍</span>
@@ -172,7 +172,7 @@ function App() {
               </div>
             )}
           </div>
-        
+
 
           {/* Central Section */}
 
@@ -188,9 +188,9 @@ function App() {
 
           <div className="category-grid">
             {['disease', 'medicine'].map(cat => (
-              <button 
-                key={cat} 
-                className={type === cat ? 'active' : ''} 
+              <button
+                key={cat}
+                className={type === cat ? 'active' : ''}
                 onClick={() => setType(cat)}
               >
                 {cat === 'disease' ? '🤒 Disease' : '💊 Medicine'}
@@ -202,10 +202,10 @@ function App() {
           {/* Main Search Bar */}
 
           <form className="search-form" onSubmit={(e) => { e.preventDefault(); performSearch(input); }}>
-            <input 
-              value={input} 
-              onChange={(e) => setInput(e.target.value)} 
-              placeholder={`Search for ${type}...`} 
+            <input
+              value={input}
+              onChange={(e) => setInput(e.target.value)}
+              placeholder={`Search for ${type}...`}
             />
             <button type="submit">{loading ? "Searching...🐸" : "Ask Froggy"}</button>
           </form>
@@ -217,7 +217,7 @@ function App() {
         /* CASE B: RESULT VIEW (After API Response) */
 
         <div className="result-view">
-          
+
 
           {/* Sidebar Floating Actions (LHS & RHS) */}
 
@@ -232,7 +232,7 @@ function App() {
 
 
           {/* RHS Floating Actions */}
-          
+
           <div className="side-actions right-side">
             <button className="icon-btn pdf" onClick={downloadPDF}>
               📥 <span>Download</span>
@@ -244,7 +244,7 @@ function App() {
 
 
           {/* Printable Report Card */}
-          
+
           <div id="report-card-capture" className="report-card">
             <h1 className="report-heading">Analysis Result: {result.name || "HEALTH REPORT"}</h1>
 
@@ -269,11 +269,26 @@ function App() {
                   <div className="info-box medicine-box">
                     <h2 className="box-heading">💊 Suggested Medicines</h2>
                     <div className="box-content">
+
+
+                      {/* Medicines list*/}
+
                       {result.medicines?.map((med, i) => (
-                        <div key={i} className="point-item medicine-point">
+                        <div key={i} className="point-item">
                           <span>✦</span> {med}
                         </div>
                       ))}
+
+
+                      {/* 🆕 Disclaimer Box */}
+
+                      <div className="single-disclaimer-box">
+                        <span className="warning-icon">⚠️</span>
+                        <p>
+                          <strong>Medical Disclaimer:</strong> Information is for educational purposes only.
+                          Always consult a healthcare professional before taking any medication.
+                        </p>
+                      </div>
                     </div>
                   </div>
                 </>
@@ -296,7 +311,7 @@ function App() {
 
 
               {/* Resources Section */}
-              
+
               <div className="info-box resources-box">
                 <h2 className="box-heading">📚 Verified Resources</h2>
                 <div className="box-content">
