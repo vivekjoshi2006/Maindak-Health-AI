@@ -542,13 +542,81 @@ body::-webkit-scrollbar-thumb {
   justify-content: center;
 }
 
+
 .point-item {
-  font-size: 19px;
+  display: flex;           /* Utilizes Flexbox for layout control */
+  align-items: flex-start; /* Keeps the star aligned with the top of the text */
+  gap: 12px;               /* Defines the spacing between the star and the text */
+  font-size: 18px;
   line-height: 1.6;
   color: var(--text);
-  margin-bottom: 25px; 
-  padding: 10px;
+  margin-bottom: 25px;     /* Adds a 1-line equivalent gap between points */
   text-align: left;
+}
+
+.point-item span {
+  color: var(--primary);
+  font-weight: bold;
+  flex-shrink: 0;         /* Prevents the star icon from squeezing/shrinking */
+  margin-top: 2px;        /* Vertically aligns the star with the first line of text */
+}
+
+.med-disclaimer {
+  font-size: 13px;
+  font-style: italic;
+  opacity: 0.8;
+  color: #e67e22;         
+  display: block;
+  margin-top: 5px;
+}
+
+
+/* --- SINGLE DISCLAIMER BOX (Inside Medicine Card) --- */
+
+.single-disclaimer-box {
+  margin-top: 20px;
+  padding: 15px 20px;
+  background: rgba(230, 126, 34, 0.08); 
+  border-radius: 20px;
+  border: 1px dashed #e67e22;
+  display: flex;
+  align-items: center;
+  gap: 15px;
+  text-align: left;
+}
+
+.warning-icon {
+  font-size: 24px;
+  flex-shrink: 0;
+}
+
+.single-disclaimer-box p {
+  margin: 0;
+  font-size: 14px;
+  line-height: 1.4;
+  color: #d35400; 
+  font-style: italic;
+}
+
+.dark .single-disclaimer-box {
+  background: rgba(255, 255, 255, 0.05);
+  border-color: var(--primary);
+}
+.dark .single-disclaimer-box p {
+  color: #fab1a0;
+}
+
+.point-item {
+  display: flex;
+  align-items: flex-start;
+  gap: 12px;
+  margin-bottom: 22px;
+  text-align: left;
+}
+.point-item span {
+  color: var(--primary);
+  flex-shrink: 0;
+  margin-top: 4px;
 }
 
 
