@@ -351,9 +351,9 @@ body::-webkit-scrollbar-thumb {
 
 .about-card-popup {
   background: var(--card);
-  width: 380px;
-  padding: 30px 30px;
-  border-radius: 45px;
+  width: 500px;
+  padding: 20px 30px;
+  border-radius: 100px;
   border: 4px solid var(--primary);
   position: relative;
   box-shadow: 0 30px 60px rgba(0,0,0,0.25);
@@ -363,15 +363,39 @@ body::-webkit-scrollbar-thumb {
 }
 
 
-.frog-head-large { font-size: 80px; display: block; margin-bottom: 40px; filter: drop-shadow(0 5px 10px rgba(0,0,0,0.1)); }
-.about-title-main { font-family: 'Fredoka', sans-serif; font-size: 40px; color: var(--primary); font-weight: 700; letter-spacing: 1px; }
+.frog-head-large { 
+  font-size: 100px; 
+  display: block; 
+  margin-bottom: 0px;
+  cursor: pointer;
+  filter: drop-shadow(0 10px 15px rgba(0, 0, 0, 0.1));
+  animation: bounce 2.5s infinite ease-in-out; 
+  transition: all 0.5s cubic-bezier(0.175, 0.885, 0.32, 1.275); 
+}
+
+
+.frog-head-large:hover { 
+  transform: translateY(-25px) scale(1.2) rotate(10deg); 
+  filter: drop-shadow(0 15px 25px rgba(46, 204, 113, 0.6)); 
+}
+
+
+.about-title-main { 
+  font-family: 'Fredoka', sans-serif; 
+  font-size: 50px; 
+  color: var(--primary); 
+  margin-top: 0px;
+  margin-bottom: 10px;
+  font-weight: 700; 
+  letter-spacing: 1px; 
+}
 
 
 
 /* Info Lines */
 
 .about-interactive-info {
-  margin: 25px 0;
+  margin: 0px 0;
   display: flex;
   flex-direction: column; gap: 12px;
 }
@@ -381,14 +405,20 @@ body::-webkit-scrollbar-thumb {
     padding: 15px 20px;
     border-radius: 20px;
     border-left: 6px solid var(--primary);
-    margin-bottom: 15px;
+    margin-bottom: 0px;
     transition: 0.3s;
     display: flex;
     align-items: flex-start;
     gap: 15px;
 }
 
-.info-emoji { font-size: 24px; flex-shrink: 0; line-height: 1; }
+
+.info-emoji { 
+  font-size: 24px; 
+  flex-shrink: 0; 
+  line-height: 1; 
+}
+
 
 .info-line p {
     margin: 0;
@@ -404,15 +434,26 @@ body::-webkit-scrollbar-thumb {
     background: var(--primary);
 }
 
-.info-line:hover p { color: white; }
-.about-divider-glow { border: 0; height: 2px; background: linear-gradient(to right, transparent, var(--primary), transparent); margin: 20px 0; opacity: 0.5; }
+
+.info-line:hover p { 
+  color: white; 
+}
+
+
+.about-divider-glow { 
+  border: 0; 
+  height: 2px; 
+  background: linear-gradient(to right, transparent, var(--primary), transparent); 
+  margin: 20px 0; 
+  opacity: 0.5; 
+}
 
 
 
 /* Creator Profile Section */
 
 .credit-label-text {
-  font-size: 20px;
+  font-size: 30px;
   text-transform: uppercase;
   color: var(--primary);
   opacity: 1;
@@ -422,8 +463,9 @@ body::-webkit-scrollbar-thumb {
   margin-bottom: 5px;
 }
 
+
 .creator-name-mega {
-  font-size: 35px;
+  font-size: 40px;
   font-weight: 800;
   color: var(--text);
   margin: 10px 0 25px 0;
@@ -436,7 +478,15 @@ body::-webkit-scrollbar-thumb {
   filter: drop-shadow(0 2px 4px rgba(0,0,0,0.1));
 }
 
-.contact-dock { display: flex; justify-content: center; gap: 20px; align-items: center; position: relative; margin-top: 10px; }
+
+.contact-dock { 
+  display: flex; 
+  justify-content: center; 
+  gap: 20px; 
+  align-items: center; 
+  position: relative; 
+  margin-top: 10px; 
+}
 
 
 .social-icon-btn {
@@ -542,105 +592,17 @@ body::-webkit-scrollbar-thumb {
   justify-content: center;
 }
 
-
 .point-item {
-  display: flex;           /* Utilizes Flexbox for layout control */
-  align-items: flex-start; /* Keeps the star aligned with the top of the text */
-  gap: 12px;               /* Defines the spacing between the star and the text */
-  font-size: 18px;
+  font-size: 19px;
   line-height: 1.6;
   color: var(--text);
-  margin-bottom: 25px;     /* Adds a 1-line equivalent gap between points */
+  margin-bottom: 25px; 
+  padding: 10px;
   text-align: left;
-}
-
-.point-item span {
-  color: var(--primary);
-  font-weight: bold;
-  flex-shrink: 0;         /* Prevents the star icon from squeezing/shrinking */
-  margin-top: 2px;        /* Vertically aligns the star with the first line of text */
-}
-
-.med-disclaimer {
-  font-size: 13px;
-  font-style: italic;
-  opacity: 0.8;
-  color: #e67e22;         
-  display: block;
-  margin-top: 5px;
-}
-
-
-/* --- SINGLE DISCLAIMER BOX (Inside Medicine Card) --- */
-
-.single-disclaimer-box {
-  margin-top: 20px;
-  padding: 15px 20px;
-  background: rgba(230, 126, 34, 0.08); 
-  border-radius: 20px;
-  border: 1px dashed #e67e22;
-  display: flex;
-  align-items: center;
-  gap: 15px;
-  text-align: left;
-}
-
-.warning-icon {
-  font-size: 24px;
-  flex-shrink: 0;
-}
-
-.single-disclaimer-box p {
-  margin: 0;
-  font-size: 14px;
-  line-height: 1.4;
-  color: #d35400; 
-  font-style: italic;
-}
-
-.dark .single-disclaimer-box {
-  background: rgba(255, 255, 255, 0.05);
-  border-color: var(--primary);
-}
-.dark .single-disclaimer-box p {
-  color: #fab1a0;
-}
-
-.point-item {
-  display: flex;
-  align-items: flex-start;
-  gap: 12px;
-  margin-bottom: 22px;
-  text-align: left;
-}
-.point-item span {
-  color: var(--primary);
-  flex-shrink: 0;
-  margin-top: 4px;
 }
 
 
 /* Resource Links inside Results */
-
-.resource-list-vertical {
-  display: flex;
-  flex-direction: column; 
-  gap: 15px;              
-  align-items: center;    
-  margin-top: 15px;
-}
-
-.resource-item-vertical {
-  display: flex;
-  align-items: center;
-  gap: 12px;
-  width: fit-content;
-}
-
-.bullet-icon {
-  color: var(--primary);
-  font-size: 18px;
-}
 
 .res-link {
   color: #3498db;
@@ -653,10 +615,6 @@ body::-webkit-scrollbar-thumb {
 .res-link:hover {
   color: var(--primary);
   text-decoration: underline;
-}
-
-.dark .res-link {
-  color: #5dade2;
 }
 
 
