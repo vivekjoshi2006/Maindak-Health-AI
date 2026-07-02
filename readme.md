@@ -1,4 +1,4 @@
-# 🐸 Maindak — The Intelligent Health Oracle
+# 🐸 Maindak — An Interactive Health Assistant
 
 ![Status](https://img.shields.io/badge/Status-Live-2ecc71?style=for-the-badge)
 ![Backend](https://img.shields.io/badge/Backend-Python_Flask-3776AB?style=for-the-badge&logo=python&logoColor=white)
